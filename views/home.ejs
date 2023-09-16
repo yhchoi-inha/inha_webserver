@@ -1,5 +1,55 @@
 <div class="row my-5">
     <div class="col my-5">
-        <h1 class="text-center">홈페이지 입니다.</h1>
+        <!-- 검색폼 -->
+        <div class="row mb-2 justify-content-end">
+            <form name="frm" class="col-6 col-md-4 col-lg-3">
+                <div class="input-group">
+                    <input name="query" type="text" class="form-control" value="자바">
+                    <button class="btn btn-primary">검색</button>
+                </div>
+            </form>
+        </div>
+        <!-- 도서검색 결과 -->
+        <div id="div_books" class="row"></div>
     </div>
 </div>
+<!-- 도서 검색 template -->
+<script type="x-handlebars-template" id="temp_books">
+    {{#each documents}}
+        <div class="col col-6 col-md-4 col-lg-2 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{thumbnail}}" width="90%" style="margin:0 auto; display:block">
+                    <div class="ellipsis pt-3" style="form-size:0.8rem">{{title}}</div>
+                </div>
+                <div class="card-footer" style="font-size:0.8rem">
+                    {{price}}
+                </div>
+            </div>
+        </div>
+    {{/each}}
+</script>
+
+<script>
+    let query = $(frm.query).val();
+    getBooks();
+    $(frm).on("submit", function(e){
+        e.preventDefault();
+        query=$(frm.query).val();
+        getBooks();
+    });
+
+    function getBooks(){
+        $.ajax({
+            type:"get",
+            url:"https://dapi.kakao.com/v3/search/book?target=title",
+            headers: {"Authorization": "KakaoAK 47d18512e80079439c076a3605f727e4"},
+            data:{query:query, page:1, size:6},
+            success:function(result){
+                console.log(result);
+                let temp = Handlebars.compile($("#temp_books").html());
+                $("#div_books").html(temp(result));
+            }
+        });
+    }
+</script>
