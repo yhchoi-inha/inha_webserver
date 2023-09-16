@@ -11,6 +11,12 @@
         </div>
         <!-- 도서검색 결과 -->
         <div id="div_books" class="row"></div>
+        <!-- 페이지 이동버튼 -->
+        <div class="text-center">
+            <button id="prev" class="btn btn-primary">이전</button>
+            <span id="span_page" class="mx-3"></span>
+            <button id="next" class="btn btn-primary">다음</button>
+        </div>
     </div>
 </div>
 <!-- 도서 검색 template -->
@@ -32,10 +38,25 @@
 
 <script>
     let query = $(frm.query).val();
+    let page = 1;
+
     getBooks();
     $(frm).on("submit", function(e){
         e.preventDefault();
         query=$(frm.query).val();
+        page=1;
+        getBooks();
+    });
+
+    // 이전 버튼 클릭
+    $("#prev").on("click", function(){
+        page--;
+        getBooks();
+    });
+
+    // 다음 버튼 클릭
+    $("#next").on("click", function(){
+        page++;
         getBooks();
     });
 
@@ -44,11 +65,19 @@
             type:"get",
             url:"https://dapi.kakao.com/v3/search/book?target=title",
             headers: {"Authorization": "KakaoAK 47d18512e80079439c076a3605f727e4"},
-            data:{query:query, page:1, size:6},
+            data:{query:query, page:page, size:6},
             success:function(result){
                 console.log(result);
                 let temp = Handlebars.compile($("#temp_books").html());
                 $("#div_books").html(temp(result));
+                let last = Math.ceil(result.meta.pageable_count/6);
+                $("#span_page").html(page + "/" + last);
+
+                if(page == 1) $("#prev").attr("disabled", true)
+                else $("#prev").attr("disabled", false);
+
+                if(result.meta.is_end) $("#next").attr("disabled", true)
+                else $("#next").attr("disabled", false);
             }
         });
     }
