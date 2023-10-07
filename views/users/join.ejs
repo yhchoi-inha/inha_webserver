@@ -23,3 +23,33 @@
         </div>
     </div>
 </div>
+
+<script type="module">
+    // import
+    import { app } from '/javascripts/firebase.js';
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    const auth = getAuth(app);
+
+    $(frm).on("submit", function(e){
+        e.preventDefault();
+        const email = $(frm.email).val();
+        const pass = $(frm.password).val();
+
+        // 유효성 체크
+        if(!email.includes("@")){
+            alert("this email is not vaild");
+            $(frm.email).val("");
+            $(frm.email).focus();
+        } else if(pass.length < 8) {
+            alert("password is up to 8 length");
+        } else {
+            // 회원 등록
+            createUserWithEmailAndPassword(auth, email, pass).then(success => {
+                alert("join complete!");
+                location.href='/users/login';
+            }).catch(error => {
+                alert("already exist member");
+            });
+        }
+    });
+</script>
