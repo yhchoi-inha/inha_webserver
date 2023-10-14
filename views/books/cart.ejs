@@ -6,7 +6,12 @@
     <table class="table">
         {{#each .}}
             <tr>
+                <td><img src="{{thumbnail}}" width="30"></td>
                 <td>{{title}}</td>
+                <td>{{authors}}</td>
+                <td>{{price}}</td>
+                <td>{{publisher}}</td>
+                <td><button class="btn btn-danger btn-sm" isbn="{{isbn}}">삭제</button></td>
             </tr>
         {{/each}}
     </table>
@@ -15,7 +20,7 @@
 <script type="module">
     // import
     import { app } from '/javascripts/firebase.js';
-    import { getDatabase, ref, onValue} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 
     const db = getDatabase(app); // app 시험에 나옴
 
@@ -32,6 +37,14 @@
         $("#div_cart").html(temp(items));
     });
 
-
+    // 리스트 삭제
+    $("#div_cart").on('click', '.btn', async function(){
+        const isbn = $(this).attr("isbn");
+        if(!confirm(`${isbn} 삭제하실래요?`)) return;
+        
+        const ref_cart = ref(db, `cart/${sessionStorage.getItem("uid")}/${isbn}`);
+        await remove(ref_cart);
+        alert("삭제되었습니다.");
+    });
 
 </script>
