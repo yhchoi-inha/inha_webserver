@@ -40,7 +40,7 @@
                 </div>
                 <div class="card-footer" style="font-size:0.8rem">
                     {{format price}}
-                    <i class="bi bi-cart-check float-end" book="{{book @this}}"></i>
+                    <i class="cart bi bi-cart-check float-end" book="{{book @this}}"></i>
                 </div>
             </div>
         </div>
@@ -65,11 +65,44 @@
     });
 </script>
 
-<script>
+<script type="module"> // module 시험에 나옴
+    // import
+    import { app } from '/javascripts/firebase.js';
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+    const db = getDatabase(app); // app 시험에 나옴
+
     let query = $(frm.query).val();
     let page = 1;
 
     getBooks();
+
+    // 장바구니를 클릭한 경우
+    $("#div_books").on("click", ".cart", async function(){
+        if(!sessionStorage.getItem("uid")){
+            alert("로그인 후 이용 부탁 드립니다.");
+            location.href='/users/login';
+            return;
+        }
+
+        const book = JSON.parse($(this).attr("book"));
+        // console.log(book);
+
+        const ref_cart = ref(db, `cart/${sessionStorage.getItem("uid")}/${book.isbn}`);
+
+        // 장바구니 존재 유무
+        const result = await get(ref_cart);
+        // console.log(result.val());
+
+        if(result.val()){
+            alert("이미 장바구니에 존재합니다.");
+        } else {
+            if(!confirm("장바구니에 추가 하시겠습니까?")) return;
+            set(ref_cart, book);
+            alert("장바구니에 추가되었습니다.");
+        }
+    });
+
     $(frm).on("submit", function(e){
         e.preventDefault();
         query=$(frm.query).val();
@@ -77,16 +110,7 @@
         getBooks();
     });
 
-    // 장바구니 클릭 시
-    $("#div_books").on('click', '.bi-cart-check', function(){
-        if(!sessionStorage.getItem("uid")){
-            location.href='/users/login';
-        } else {
-            // 장바구니에 등록
-            const book = JSON.parse($(this).attr("book"));
-            console.log(book);
-        }
-    });
+
 
     // img click(modal)
     $("#div_books").on('click', 'img', function(){
