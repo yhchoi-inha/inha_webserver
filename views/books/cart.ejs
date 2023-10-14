@@ -7,6 +7,7 @@
         <tr>
             <td colspan="7">
                 <input type="checkbox" id="all">
+                <button class="btn btn-warning btn-sm ms-3">선택 삭제</button>
             </td>
         </tr>
         {{#each .}}
@@ -52,6 +53,22 @@
         }
     });
 
+    // 체크 목록 삭제
+    $("#div_cart").on('click', '.btn-warning', function(){
+        const chk = $("#div_cart .chk:checked").length;
+
+        if(chk == 0){
+            alert("삭제할 목록을 선택 해 주세요.");
+        } else {
+            if(!confirm(chk + "개 도서를 삭제하시겠습니까?")) return;
+            // 도서 삭제
+            $("#div_cart .chk:checked").each(item => {
+                alert();
+            })
+            
+        }
+    });
+
     // 장바구니 목록
     const ref_cart = ref(db, `cart/${sessionStorage.getItem("uid")}`);
     onValue(ref_cart, result =>{
@@ -66,7 +83,7 @@
     });
 
     // 리스트 삭제
-    $("#div_cart").on('click', '.btn', async function(){
+    $("#div_cart").on('click', '.btn-danger', async function(){
         const isbn = $(this).attr("isbn");
         if(!confirm(`${isbn} 삭제하실래요?`)) return;
         
