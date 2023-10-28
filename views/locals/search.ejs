@@ -29,20 +29,53 @@
             <td>{{place_name}}</td>
             <td>{{address_name}}</td>
             <td>{{phone}}</td>
-            <td><button class="btn btn-primary" x="{{x}}" y="{{y}}">위치보기</button></td>
+            <td><button class="btn btn-primary location" x="{{x}}" y="{{y}}">위치보기</button></td>
+            <td><button class="btn btn-primary btn-sm favorite" local="{{toString @this}}">즐겨찾기</button></td>
         </tr>
         {{/each}}
     </table>
 </script>
 <script>
+    Handlebars.registerHelper("toString", function(local){
+        return JSON.stringify(local);
+    });
+</script>
+<script type="module">
+    // import
+    import { app } from '/javascripts/firebase.js';
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+    const db = getDatabase(app);
+
+
     let query = $(frm.query).val();
     let page = 1;
     let size = 5;
 
     getLocals();
 
+    // 즐겨찾기 버튼
+    $("#div_locals").on("click", ".favorite", async function(){
+        if(!sessionStorage.getItem("email")){
+            alert("로그인 후 이용 가능 합니다.");
+            sessionStorage.setItem("target", "/locals");
+            location.href = '/users/login';
+        } else {
+            const local = JSON.parse($(this).attr('local'));
+            const ref_favorite = ref(db, `favorite/${sessionStorage.getItem("uid")}/${local.id}`);
+            const snapshot = await get(ref_favorite);
+
+            if(snapshot.val()){
+                alert("이미 즐겨찾기 목록에 존재합니다.");
+            } else {
+                await set(ref_favorite, local);
+                alert("등록되었습니다.");
+            }
+        }
+    });
+
     // 위치보기 버튼
-    $("#div_locals").on("click", "button", function(){
+    $("#div_locals").on("click", ".location", function(){
         let x = $(this).attr("x");
         let y = $(this).attr("y");
 
