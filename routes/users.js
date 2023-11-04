@@ -16,5 +16,10 @@ router.get('/join', function(req, res, next){
   res.render('index', {title:'Join', pageName:'users/join.ejs'});
 })
 
+/* Page :: mypage 이동 */
+router.get('/mypage', function(req, res, next){
+  res.render('index', {title:'Mypage', pageName:'users/mypage.ejs'});
+})
+
 
 module.exports = router;
