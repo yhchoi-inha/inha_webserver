@@ -1,10 +1,10 @@
 <div class="my-5">
     <h1 class="text-center mb-5">글쓰기</h1>
-    <form name="frm" class="card p-3">
-        <input type="text" name="title" placeholder="제목을 입력하세요." class="form-control mb-2">
-        <textarea name="body" id="" cols="30" rows="10" placeholder="내용을 입력하세요." class="form-control"></textarea>
-        <div class="text-center my-3">
-            <button class="btn btn-primary px-5">등록</button>
+    <form name="frm">
+        <input name="title" type="text" class="form-control" placeholder="제목을 입력하세요." />
+        <textarea name="body" class="form-control mt-2" placeholder="내용을 입력하세요." rows="10"></textarea>
+        <div class="text-center mt-5">
+            <button type="submit" class="btn btn-primary px-5">등록</button>
             <button type="reset" class="btn btn-secondary px-5">취소</button>
         </div>
     </form>
@@ -15,36 +15,31 @@
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
     const db = getFirestore(app);
 
-    $(frm).on('submit', async function(e){
+    $(frm).on("submit", async function(e){
         e.preventDefault();
-
         const title = $(frm.title).val();
         const body = $(frm.body).val();
 
-        if(title == ""){
-            alert('제목을 입력하세요.');
+        if(title == "" || body == ""){
+            alert("제목 또는 내용을 입력해주세요.");
             $(frm.title).focus();
+        } else {
+            if(confirm("저장하실래요?")){
+                // 게시글 저장
+                const email = sessionStorage.getItem("email");
+                const date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+                // console.log(date, email, title, body);
 
-            return;
+                await addDoc(collection(db, "posts"), {
+                    email:email, 
+                    title:title, 
+                    body:body, 
+                    date:date
+                });
+
+                alert("등록완료");
+                location.href="/posts";
+            }
         }
-
-        if(body == ""){
-            alert('내용을 입력하세요.');
-            $(frm.body).focus();
-
-            return;
-        }
-
-        if(confirm("새로운 게시글을 등록하실래요?")){
-            // 게시글 등록
-            const email = sessionStorage.getItem("email");
-            const date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-            const data = {email, date, title, body};
-            // console.log(data);
-
-            await addDoc(collection(db, 'posts'), data);
-            alert('새로운 글이 등록되었습니다.');
-            location.href = '/posts';
-        }
-    });
+    })
 </script>
