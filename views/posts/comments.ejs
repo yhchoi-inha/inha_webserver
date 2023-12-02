@@ -26,7 +26,7 @@
                 <small>{{date}}</small>
             </div>
             <div class="view{{id}}">
-                <div class="ellipsis2">{{body}}</div>
+                <div class="ellipsis2 body">{{body}}</div>
                 <div class="text-end mt-3" style="{{fn_button email}}">
                     <button class="btn btn-update btn-sm btn-success" id="{{id}}">수정</button>
                     <button class="btn btn-delete btn-sm btn-danger" id="{{id}}">삭제</button>
@@ -68,6 +68,10 @@
     if(sessionStorage.getItem("email")){
         $("#div_insert, #div_login").toggle();
     }
+
+    $("#div_comments").on("click", ".body", async function(){
+        $(this).toggleClass("ellipsis2");    
+    });
 
     $("#div_comments").on("click", ".btn-delete", async function(){
         const id = $(this).attr('id');
